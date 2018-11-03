@@ -14,9 +14,21 @@ var MEAN_ARTERIAL_PRESSURE =
   var BP_TIME = "encounter/blood_pressure/any_event/time";
 
   var isChangingMethod = false;
+
+  console.log("I am here");
   function canChange(){
       return isChangingMethod;
   }
+
+  api.addListener(BMI, "onChildAdded", function(id,value, parent){
+console.log("BMI added");
+updateBMI();
+
+  });
+  api.addListener(BMI, "OnFormInitialized", function(id, value, parent){
+      console.log("OnFormInitialized");
+      updateBMI();
+  });
 
   api.addListener(WEIGHT, "OnChanged", function(id, value, parent){
       updateBMI();
@@ -52,6 +64,7 @@ function updateBMI(){
         isChangingMethod = true;
         var bmi = calculateBMI(w,h);
         console.log("BMI:" + bmi);
+
         var bmiRM = new DvQuantity();
         bmiRM.magnitude = bmi;
         bmiRM.units = "kg/m2";
@@ -61,6 +74,10 @@ function updateBMI(){
         var bmiRMMethod = api.getFieldValue(BMI_METHOD);
         console.log(bmiRMMethod);
         bmiRMMethod.DefiningCode.CodeString = "at0007";
+
+        var bmiTimeRm = new DvDateTime(new Date());
+        api.setFieldValue(BMI_TIME, bmiTimeRm);
+
         
         api.setFieldValue(BMI_METHOD, bmiRMMethod);
         isChangingMethod = false;
